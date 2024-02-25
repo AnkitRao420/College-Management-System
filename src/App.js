@@ -1,24 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+
+/// src/App.js
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import LoginPage from './Pages/LoginPage';
+import StudentRegistration from './Components/StudentRegistration';
+import AdminLogin from './Components/AdminLogin';
+import StudentLogin from './Components/StudentLogin'
+import Home from './Pages/Home';
+import { auth } from './firebase';
 
 function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      setUser(user);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <div className="App">
+        <Switch>
+          <Route path="/login/admin" exact component={AdminLogin} />
+          <Route path="/login/student" exact component={StudentLogin} />
+          <Route path="/register" exact component={StudentRegistration} />
+          {user ? (
+            <Route path="/" exact component={Home} />
+          ) : (
+            <Route path="/" exact component={LoginPage} />
+          )}
+        </Switch>
+      </div>
+    </Router>
   );
 }
 
